@@ -1,0 +1,10 @@
+Hallo.
+Wie geht es dir?
+Mir geht es gut.
+Wie heißt du?
+Ich heiße John.
+Ich mag maschinelles Lernen.
+Die Katze schläft.
+Der Hund rennt.
+Heute ist ein schöner Tag.
+Bis morgen.

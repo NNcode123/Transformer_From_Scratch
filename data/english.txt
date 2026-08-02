@@ -1,0 +1,10 @@
+Hello.
+How are you?
+I am fine.
+What is your name?
+My name is John.
+I like machine learning.
+The cat is sleeping.
+The dog is running.
+Today is a beautiful day.
+See you tomorrow.
