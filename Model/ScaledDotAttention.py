@@ -11,7 +11,7 @@ class ScaledDotAttention(nn.Module):
 
 
 
-    def forward(queries: torch.Tensor, keys: torch.Tensor, values:torch.Tensor, mask: Union[torch.Tensor, None] = None):
+    def forward(self, queries: torch.Tensor, keys: torch.Tensor, values:torch.Tensor, mask: Union[torch.Tensor, None] = None):
 
         """
 
@@ -48,10 +48,13 @@ class ScaledDotAttention(nn.Module):
 
         res = queries @ keys.transpose(-1,-2)
 
-        size_diff = queries.ndim - mask.ndim 
+        size_diff = queries.ndim  #- mask.ndim 
+
+
+    
 
         for _ in range(size_diff):
-            mask = mask.unsqueeze(1)
+            mask = mask.unsqueeze(1) if mask else None
             
 
         scaled_res:torch.Tensor = res/(d_k**0.5)

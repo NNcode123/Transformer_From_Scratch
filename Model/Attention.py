@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torchinfo import summary
 from .ScaledDotAttention import ScaledDotAttention
 
 
@@ -29,6 +30,7 @@ class MultiHeadAttention(nn.Module):
         self.proj_Q = nn.Linear(in_features = total_embed_dim, out_features = total_embed_dim)
         self.proj_K =  nn.Linear(in_features = total_embed_dim, out_features = total_embed_dim  )
         self.proj_V = nn.Linear(in_features = total_embed_dim, out_features = total_embed_dim)
+        self.proj_out = nn.Linear(in_features =  total_embed_dim, out_features = total_embed_dim)
 
         self.num_heads = num_heads
 
@@ -47,7 +49,7 @@ class MultiHeadAttention(nn.Module):
 
         query_proj = self.proj_Q(query)
 
-        value_proj = self.prov_V(query)
+        value_proj = self.proj_V(value)
 
         key_proj  = key_proj.unflatten(-1, [self.num_heads, self.head_embed_size ]).permute(0,2,1,3)
 
@@ -55,12 +57,32 @@ class MultiHeadAttention(nn.Module):
         
         value_proj  = value_proj.unflatten(-1, [self.num_heads, self.head_embed_size ]).permute(0,2,1,3)
 
-        output_tens: torch.Tensor = ScaledDotAttention(key_proj, query_proj, value_proj)
+        scaled_attn  = ScaledDotAttention()
+
+        output_tens = scaled_attn(key_proj, query_proj, value_proj)
 
 
-        return output_tens.transpose(1,2).flatten(-2,-1)
+        return self.proj_out(output_tens.transpose(1,2).flatten(-2,-1))
 
 
+
+
+if __name__ == "__main__":
+
+    batch = 64
+    seq_len = 12
+    embed_dim = 512
+
+    X = torch.randn(batch,seq_len,embed_dim)
+
+
+    mattention = MultiHeadAttention(512, 8)
+
+    summary(mattention, input_data=(
+        torch.randn(batch, seq_len, embed_dim),  # query
+        torch.randn(batch, seq_len, embed_dim),  # key
+        torch.randn(batch, seq_len, embed_dim),  # value
+    ))
 
 
 
