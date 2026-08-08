@@ -48,11 +48,8 @@ class ScaledDotAttention(nn.Module):
 
         res = queries @ keys.transpose(-1,-2)
 
-        size_diff = queries.ndim  #- mask.ndim 
-
-
+        size_diff = queries.ndim  - mask.ndim if mask else 0
     
-
         for _ in range(size_diff):
             mask = mask.unsqueeze(1) if mask else None
             
