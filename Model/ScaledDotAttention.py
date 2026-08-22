@@ -39,7 +39,7 @@ class ScaledDotAttention(nn.Module):
 
         the mask will have shape: (seq_len, embed_size)
 
-        Finally softmax(I)@V will have shape (batch, num_heads, seq_len, seq_len)
+        Finally softmax(I)@V will have shape (batch, num_heads, seq_len, embed_size)
         
         
         """
@@ -48,17 +48,17 @@ class ScaledDotAttention(nn.Module):
 
         res = queries @ keys.transpose(-1,-2)
 
-        size_diff = queries.ndim  - mask.ndim if mask else 0
+        size_diff = queries.ndim  - mask.ndim if mask != None else 0
     
         for _ in range(size_diff):
-            mask = mask.unsqueeze(1) if mask else None
+            mask = mask.unsqueeze(1) if mask != None else None
             
 
         scaled_res:torch.Tensor = res/(d_k**0.5)
 
-        if mask:
+        if mask != None:
 
-            scaled_res.masked_fill((mask == 0), "inf")
+            scaled_res.masked_fill((mask == 0), float("-inf"))
 
 
         scaled_res = torch.softmax(scaled_res, dim = -1)

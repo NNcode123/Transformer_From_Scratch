@@ -31,6 +31,7 @@ class MultiHeadAttention(nn.Module):
         self.proj_K =  nn.Linear(in_features = total_embed_dim, out_features = total_embed_dim  )
         self.proj_V = nn.Linear(in_features = total_embed_dim, out_features = total_embed_dim)
         self.proj_out = nn.Linear(in_features =  total_embed_dim, out_features = total_embed_dim)
+        self.scaled_attn = ScaledDotAttention()
 
         self.num_heads = num_heads
 
@@ -43,7 +44,7 @@ class MultiHeadAttention(nn.Module):
 
 
 
-    def forward(self, key, query, value):
+    def forward(self, value, key, query, mask = None):
 
         key_proj = self.proj_K(key)
 
@@ -57,9 +58,7 @@ class MultiHeadAttention(nn.Module):
         
         value_proj  = value_proj.unflatten(-1, [self.num_heads, self.head_embed_size ]).permute(0,2,1,3)
 
-        scaled_attn  = ScaledDotAttention()
-
-        output_tens = scaled_attn(key_proj, query_proj, value_proj)
+        output_tens = self.scaled_attn(key_proj, query_proj, value_proj, mask)
 
 
         return self.proj_out(output_tens.transpose(1,2).flatten(-2,-1))
