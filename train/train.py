@@ -1,9 +1,13 @@
 from Model.transformer import Transformer
+from data.dataloader import TokenDataset
 
 
-def train_model():
-    pass
+
+
 
 
 if __name__ == "__main__":
+
+    dataset = TokenDataset("", "")
+
     train_model()

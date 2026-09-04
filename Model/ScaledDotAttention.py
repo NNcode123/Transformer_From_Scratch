@@ -17,9 +17,9 @@ class ScaledDotAttention(nn.Module):
 
         The tensors will have the following shape:
 
-        queries: (batch, num_heads, seq_len, embed_size)
-        keys: (batch, num_heads, seq_len, embed_size)
-        values: (batch, num_heads, seq_len, embed_size_v)
+        queries: (batch, num_heads, seq_len_q, embed_size)
+        keys: (batch, num_heads, seq_len_v, embed_size)
+        values: (batch, num_heads, seq_len_v, embed_size_v)
 
         Then I = q @ k^T/sqrt(d_k) is (batch,num_heads, seq_len, seq_len)
 
@@ -58,7 +58,7 @@ class ScaledDotAttention(nn.Module):
 
         if mask != None:
 
-            scaled_res.masked_fill((mask == 0), float("-inf"))
+            scaled_res.masked_fill_((mask == 0), float("-inf"))
 
 
         scaled_res = torch.softmax(scaled_res, dim = -1)

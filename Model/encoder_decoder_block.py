@@ -63,15 +63,6 @@ class Decoder(nn.Module):
         return self.ffd_resid(second_res_x, self.ffn(second_res_x))
 
 
-
-
-
-
-        
-
-
-
-
 class EncoderDecoder(nn.Module):
 
 
@@ -84,17 +75,21 @@ class EncoderDecoder(nn.Module):
         self.decoders = nn.ModuleList([Decoder(embed_dim, num_heads) for _ in range(num_blocks)])
 
 
-    def forward(self, src_embed, tgt_embed, src_mask, tgt_mask):
-
+    def encode(self, src_embed, src_mask):
         for encoder in self.encoders:
             src_embed = encoder(src_embed, src_mask)
 
 
+    def decode(self, src_embed, tgt_embed, src_mask, tgt_mask):
         for decoder in self.decoders:
             tgt_embed = decoder(tgt_embed, src_embed, src_mask, tgt_mask)
 
 
-        return tgt_embed
+    def forward(self, src_embed, tgt_embed, src_mask, tgt_mask):
+
+        src_embed = self.encode(src_embed,src_mask)
+
+        return self.decode(tgt_embed, src_embed,src_mask, tgt_mask)
 
  
 if __name__ == "__main__":
@@ -102,8 +97,6 @@ if __name__ == "__main__":
     encBlock = Encoder()
 
     enc = EncoderDecoder()
-
-    pos_input = torch.randn((64, 112))
 
     pos_embed = torch.randn((64,112,512))
 

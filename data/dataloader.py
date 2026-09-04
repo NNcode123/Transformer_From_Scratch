@@ -1,6 +1,5 @@
 import torch
 from torch.utils.data import DataLoader, Dataset
-import transformers
 from pathlib import Path
 from os import path
 import huggingface as hf
@@ -71,13 +70,6 @@ class TokenDataset(Dataset):
     
 
 
-
-class tokenLoader():
-
-    def __init__(self, tokens: TokenDataset, batch_size=64, shuffle=True):
-        self.tokens = tokens
-        self.batch_size = batch_size
-        self.shuffle = shuffle
 
 
 def main():
