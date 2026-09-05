@@ -49,7 +49,7 @@ class MultiHeadAttention(nn.Module):
 
 
 
-    def forward(self, value, key, query, mask = None):
+    def forward(self, query, value, key, mask = None):
 
         key_proj = self.proj_K(key)
 
@@ -61,7 +61,7 @@ class MultiHeadAttention(nn.Module):
         query_proj  = query_proj.unflatten(-1, [self.num_heads, self.head_embed_size ]).transpose(1,2)
         value_proj  = value_proj.unflatten(-1, [self.num_heads, self.head_embed_size ]).transpose(1,2)
 
-        output_tens = self.scaled_attn(key_proj, query_proj, value_proj, mask)
+        output_tens = self.scaled_attn(query_proj, value_proj, key_proj , mask)
 
 
         return self.proj_out(output_tens.transpose(1,2).flatten(-2,-1))

@@ -56,7 +56,7 @@ class Decoder(nn.Module):
 
         masked_res_x = self.masked_att_resid(x, masked_att_x)
 
-        second_att_x = self.att_layer(enc_values_keys, enc_values_keys, masked_res_x, src_mask)
+        second_att_x = self.att_layer( masked_res_x, enc_values_keys, enc_values_keys, src_mask)
 
         second_res_x = self.att_resid(second_att_x, masked_res_x)
 
@@ -79,10 +79,14 @@ class EncoderDecoder(nn.Module):
         for encoder in self.encoders:
             src_embed = encoder(src_embed, src_mask)
 
+        return src_embed
+
 
     def decode(self, src_embed, tgt_embed, src_mask, tgt_mask):
         for decoder in self.decoders:
             tgt_embed = decoder(tgt_embed, src_embed, src_mask, tgt_mask)
+
+        return tgt_embed
 
 
     def forward(self, src_embed, tgt_embed, src_mask, tgt_mask):
@@ -101,16 +105,16 @@ if __name__ == "__main__":
     pos_embed = torch.randn((64,112,512))
 
 
-    """
+    
     print(summary(enc, input_data =  (pos_embed, pos_embed, 
                                       torch.ones((64,112)),
-                                      torch.triu(torch.ones((64,112)))
+                                      torch.triu(torch.ones((64,112,112))).long() & torch.ones((64, 1, 112)).long()
 
                                  )
-                                      )
-    """
+                                      ))
+    
    
-    print(summary(encBlock, input_data = pos_embed))
+    #print(summary(enc, input_data = pos_embed))
 
 
 

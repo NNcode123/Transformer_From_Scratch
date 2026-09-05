@@ -11,7 +11,7 @@ class ScaledDotAttention(nn.Module):
 
 
 
-    def forward(self, queries: torch.Tensor, keys: torch.Tensor, values:torch.Tensor, mask: Union[torch.Tensor, None] = None):
+    def forward(self, queries: torch.Tensor, values: torch.Tensor, keys :torch.Tensor, mask: Union[torch.Tensor, None] = None):
 
         """
 
@@ -21,7 +21,7 @@ class ScaledDotAttention(nn.Module):
         keys: (batch, num_heads, seq_len_v, embed_size)
         values: (batch, num_heads, seq_len_v, embed_size_v)
 
-        Then I = q @ k^T/sqrt(d_k) is (batch,num_heads, seq_len, seq_len)
+        Then I = q @ k^T/sqrt(d_k) is (batch,num_heads, seq_len_q, seq_len_v)
 
         then ignoring the batch,num_head dims (those are for paralleization purposes), the resulting matrix is a matrix where 
 
@@ -47,6 +47,10 @@ class ScaledDotAttention(nn.Module):
         d_k  = queries.size(-1)
 
         res = queries @ keys.transpose(-1,-2)
+        print("queries:", queries.shape)
+        print("keys:", keys.shape)
+        print("res:", res.shape)
+        print("mask:", mask.shape if mask is not None else None)
 
         size_diff = queries.ndim  - mask.ndim if mask != None else 0
     

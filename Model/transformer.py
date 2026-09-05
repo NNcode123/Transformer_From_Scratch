@@ -30,24 +30,34 @@ class Transformer(nn.Module):
     @torch.no_grad()
     def generate(self, input_tensor, input_mask):
 
+        input_tensor = self.src_factory(input_tensor)
+
         encode_embed = self.enc_dec_blocks.encode(input_tensor, input_mask )
 
-        input_mask = self.src_factory(input_mask)
+        print(f"size_0 : {input_mask.size(0)}, size_1: {encode_embed.size(1)}")
 
-        decode_seq = torch.ones(input_mask.size(0),1)
+        decode_seq = torch.ones(input_mask.size(0),1).long()#.type(torch.long)
+
+        mask = input_mask.unsqueeze(1) & torch.triu(torch.ones((input_mask.size(0),input_mask.size(1),input_mask.size(1)))).long()
+
+        print(f"input_mask_shape : {input_mask.unsqueeze(1).shape}, orig_mask_shape: {mask.shape}")
 
 
-        for iter in range(encode_embed.size(1)):
+        for itr in range(1,encode_embed.size(1)+1):
 
-            decode_mask = torch.triu(torch.ones_like(input_mask)) & input_mask
+            decode_mask = mask[:,:itr,:itr]
+
+            print(f"decode_mask_shape: {decode_mask.shape}")
 
             output_embed = self.tgt_factory(decode_seq)
 
-            output_embed = self.enc_dec_blocks.decode(output_embed, encode_embed, input_mask, decode_mask)
+            output_embed = self.enc_dec_blocks.decode(encode_embed, output_embed, input_mask, decode_mask)
 
-            next_token_batch = torch.argmax(self.classifier(output_embed[:,-1,:]), axis = 1)       
+            next_token_batch = torch.argmax(self.classifier(output_embed[:,-1,:]), axis = 1, keepdim = True)       
 
             decode_seq = torch.concat([decode_seq, next_token_batch], dim  = 1)
+
+            print(f" decode_tensor: {decode_seq.shape}, decode_size: {decode_seq}")
 
 
         return decode_seq

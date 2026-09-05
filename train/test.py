@@ -20,13 +20,21 @@ def run_tests():
         embed_dim=128,
         num_heads=4,
     )
-    model.eval()
 
-    with torch.no_grad():
-        generated_ids = model.generate(
-            encoded_source["input_ids"],
-            encoded_source["attention_mask"],
-        )
+   
+
+
+    enc_input_ids = encoded_source["input_ids"]
+
+    enc_source_ids = encoded_source["attention_mask"]
+
+    print(f"input_id_shape: {enc_input_ids.shape}, source_ids: {enc_source_ids.shape}")
+
+    
+    generated_ids = model.generate(
+        encoded_source["input_ids"],
+        encoded_source["attention_mask"],
+    )
 
     print("Source:", source_text)
     print("Generated:", tokenizer.decode(generated_ids[0], skip_special_tokens=True))
